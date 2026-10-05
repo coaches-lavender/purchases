@@ -55,8 +55,10 @@ RSpec.describe LoyaltyCalculator do
     let(:products) { {} }
     let(:positions) { [{ 'id' => 1, 'price' => BigDecimal('10.5'), 'quantity' => 3 }] }
 
-    it 'keeps exact cashback and rounds write-off limit down to whole points' do
-      expect(result.slice(:cashback, :allowed_write_off)).to eq(cashback: BigDecimal('1.575'), allowed_write_off: 31)
+    it 'keeps exact cashback and exact loyalty sum' do
+      expect(result.slice(:cashback, :allowed_write_off)).to eq(
+        cashback: BigDecimal('1.575'), allowed_write_off: BigDecimal('31.5')
+      )
     end
   end
 end

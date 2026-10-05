@@ -33,7 +33,8 @@ class PurchaseSerializer
       result.slice(:cashback_percent).merge(
         cashback: result[:cashback].floor,
         balance: user.balance,
-        allowed_write_off: [user.balance, result[:allowed_write_off]].min
+        # баллы целые: округляем вниз уже после ограничения балансом, ведь и баланс может быть дробным
+        allowed_write_off: [user.balance, result[:allowed_write_off]].min.floor
       )
     end
 

@@ -57,9 +57,27 @@ RSpec.describe 'API', :aggregate_failures do
       )
     end
 
+    context 'when loyalty sum is fractional' do
+      let(:positions) { [{ id: create(:product, :increased_cashback).id, price: 10.99, quantity: 1 }] }
+
+      it 'stores exact sum as distribution base and returns whole-point limit' do
+        expect(calculation.dig('bonuses', 'allowed_write_off')).to eq(10)
+        expect(Operation[calculation['operation_id']].allowed_write_off).to eq(BigDecimal('10.99'))
+      end
+    end
+
     it 'limits write-off by user balance' do
       user.update(bonus: 100)
       expect(calculation.dig('bonuses', 'allowed_write_off')).to eq(BigDecimal('100.0'))
+    end
+
+    it 'rounds write-off limit down after limiting by fractional balance' do
+      user.update(bonus: BigDecimal('10.5'))
+      limit = calculation.dig('bonuses', 'allowed_write_off')
+      expect(limit).to eq(10)
+
+      submission = { user: { id: user.id }, operation_id: calculation['operation_id'], write_off: limit }
+      expect(post_json('/submit', submission)['status']).to eq(200)
     end
 
     context 'when user does not exist' do
@@ -256,13 +274,34 @@ RSpec.describe 'API', :aggregate_failures do
         create(
           :operation,
           user_id: user.id, cashback: BigDecimal('19.99'), cashback_percent: BigDecimal('4.75'),
-          discount: 0, discount_percent: 0, check_summ: BigDecimal('399.8'), allowed_write_off: 399
+          discount: 0, discount_percent: 0, check_summ: BigDecimal('399.8'), allowed_write_off: BigDecimal('399.8')
         ).id
       end
       let(:write_off) { 10 }
 
       it 'rounds only the final cashback' do
-        expect(submit.dig('operation', 'cashback')).to eq(19) # floor(19.99 × (1 − 10/399)) = floor(19.49)
+        expect(submit.dig('operation', 'cashback')).to eq(19) # floor(19.99 × (1 − 10/399.8)) = floor(19.49)
+      end
+    end
+
+    context 'when loyalty sum is fractional' do
+      # как после /operation для Bronze и товара с доп. кэшбеком 10% за 10.99: 15% = 1.6485 балла
+      let!(:operation_id) do
+        create(
+          :operation,
+          user_id: user.id, cashback: BigDecimal('1.6485'), cashback_percent: 0,
+          discount: 0, discount_percent: 0, check_summ: BigDecimal('10.99'), allowed_write_off: BigDecimal('10.99')
+        ).id
+      end
+      let(:write_off) { 4 }
+
+      it 'distributes write-off over exact sum' do
+        expect(submit.dig('operation', 'cashback')).to eq(1) # floor(1.6485 × (1 − 4/10.99)) = floor(1.0485)
+      end
+
+      it 'rejects write-off above whole-point limit' do
+        response = post_json('/submit', user: user_params, operation_id:, write_off: 11)
+        expect(response['message']).to eq('Списание превышает доступную сумму')
       end
     end
 

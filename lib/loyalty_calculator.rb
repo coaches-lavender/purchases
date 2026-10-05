@@ -28,7 +28,9 @@ class LoyaltyCalculator
       discount_percent: self.class.percent(discount, total),
       # процент — от целых баллов, которые клиент получит без списания
       cashback_percent: self.class.percent(cashback.floor, check_summ),
-      allowed_write_off: items.select { _1[:loyal] }.sum { _1[:summ] }.floor
+      # точная сумма товаров программы: по ней списание распределяется при подтверждении,
+      # а целочисленный лимит списания — её округление вниз (в ответе и при проверке списания)
+      allowed_write_off: items.select { _1[:loyal] }.sum { _1[:summ] }
     }
   end
 

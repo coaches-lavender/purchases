@@ -6,7 +6,6 @@ AllCops:
   NewCops: enable
   SuggestExtensions: false
   Exclude:
-    - 'TEYCA 6/**/*'
     - 'vendor/**/*'
 
 # Пороги по умолчанию (10 строк, ABC 17) дробят линейные сценарии на мелкие методы без пользы

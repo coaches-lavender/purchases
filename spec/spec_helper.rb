@@ -3,9 +3,10 @@
 require 'fileutils'
 require 'tmpdir'
 
-# Тесты работают со схемой базы из ТЗ, но без её данных: все записи создают фабрики.
+# Тесты работают на временной копии db/test.db, но без данных: таблицы очищаются ниже,
+# все записи создают фабрики.
 db_path = File.join(Dir.mktmpdir, 'test.db')
-FileUtils.cp(File.expand_path('../TEYCA 6/test.db', __dir__), db_path)
+FileUtils.cp(File.expand_path('../db/test.db', __dir__), db_path)
 ENV['DATABASE_PATH'] = db_path
 ENV['APP_ENV'] = 'test'
 
@@ -19,7 +20,7 @@ require_relative '../app'
 FactoryBot.define { to_create(&:save) }
 FactoryBot.find_definitions
 
-# Опечатка в ключе перевода должна ронять тест, а не превращаться в "Translation missing".
+# опечатка в ключе перевода роняет тест вместр "Translation missing"
 I18n.exception_handler = lambda do |exception, *|
   raise exception.respond_to?(:to_exception) ? exception.to_exception : exception
 end
