@@ -1,0 +1,29 @@
+plugins:
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'TEYCA 6/**/*'
+    - 'vendor/**/*'
+
+# Пороги по умолчанию (10 строк, ABC 17) дробят линейные сценарии на мелкие методы без пользы
+# для чтения; литералы хешей (тела ответов, атрибуты записей) считаем за одну строку.
+Metrics/MethodLength:
+  Max: 15
+  CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+RSpec/ExampleLength:
+  CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+
+# Комментарии к классам не обязательны.
+Style/Documentation:
+  Enabled: false

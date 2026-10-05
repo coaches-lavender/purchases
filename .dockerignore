@@ -1,0 +1,11 @@
+.git
+.idea
+.DS_Store
+.rspec
+.rubocop.yml
+spec
+tmp
+TEYCA 6
+hr-dev-test.pdf
+Dockerfile
+.dockerignore

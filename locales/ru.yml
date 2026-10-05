@@ -1,0 +1,23 @@
+ru:
+  errors:
+    invalid_json: Некорректный JSON
+    json_object_expected: Ожидается JSON-объект
+    invalid_params: Некорректные параметры запроса
+    user_not_found: Пользователь не найден
+    operation_not_found: Операция не найдена
+    already_submitted: Операция уже подтверждена с другим списанием
+    write_off_exceeds_allowed: Списание превышает доступную сумму
+    not_enough_bonuses: Недостаточно бонусов
+    validation:
+      positions_required: Передайте непустой массив positions
+      invalid_position: Некорректная позиция %{path}
+      not_an_integer: Параметр %{name} должен быть целым числом
+      not_a_number: Параметр %{name} должен быть числом
+      not_positive: Параметр %{name} должен быть больше 0
+      negative: Параметр %{name} не может быть отрицательным
+  messages:
+    submitted: Операция успешно подтверждена
+  modifiers:
+    discount: Дополнительная скидка %{value}%
+    increased_cashback: Дополнительный кэшбек %{value}%
+    noloyalty: Не участвует в системе лояльности
